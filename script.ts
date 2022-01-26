@@ -12,6 +12,7 @@ const WORDS = [
 
 // TODO: Stats screen on end of the game
 // TODO: Screen keyboard
+// TODO: Updating the word every 24h
 
 const ANSWER = WORDS[Math.floor(Math.random() * WORDS.length)]
 console.log(ANSWER)
