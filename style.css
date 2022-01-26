@@ -1,5 +1,19 @@
+:root {
+    --background: #1f1f1f;
+    --present: gold;
+    --correct: lightgreen;
+    --foreground2: #808680;
+    --foreground1: #b0b6b0;
+    --foreground0: #f0f6f0;
+}
+
 *, *::after, *::before {
     box-sizing: border-box;
+    font-family: sans-serif;
+    font-weight: 700;
+    text-transform: uppercase;
+    padding: 0;
+    margin: 0;
 }
 
 body {
@@ -8,37 +22,57 @@ body {
     min-height: 100vh;
     padding: 0;
     margin: 0;
-    padding-top: 2rem;
-    background-color: black;
+    background-color: var(--background);
+}
+
+.game-wrapper {
+    max-width: 60rem;
+    padding: 2rem;
+    margin: 0 auto;
     display: flex;
-    justify-content: center;
+    flex-direction: column;
+    align-items: center;
 }
 
 #game-grid {
-    display: flex;
-    flex-direction: column;
-    gap: 1.2rem;
+    display: grid;
+    grid-template-rows: repeat(6, minmax(1.25em, 1.6em));
+    font-size: 2.5rem;
+    gap: .5em;
 }
 
 .word-row {
-    display: flex;
-    flex-direction: row;
-    gap: .6rem;
+    display: grid;
+    grid-template-columns: repeat(5, minmax(1em, 1.6em));
+    gap: .3em;
 }
 
 .letter-block {
-    border: 1px solid white;
-    width: 2.4rem;
-    height: 2.4rem;
-    color: white;
+    min-width: 1.25em;
+    min-height: 1.25em;
+    border: 2px solid var(--foreground1);
+    border-radius: .2rem;
+    color: var(--foreground0);
+
+    display: flex;
+    align-items: center;
+    justify-content: center;
 }
 
-.letter-block[data-state="yellow"] {
-    background-color: gold;
-    color: black
+.letter-block[data-state="present"] {
+    background-color: var(--present);
+    color: var(--foreground0);
+    border: none;
 }
 
-.letter-block[data-state="green"] {
-    background-color: green;
-    color: black
+.letter-block[data-state="correct"] {
+    background-color: var(--correct);
+    color: var(--foreground0);
+    border: none;
+}
+
+@media (max-width: 20rem) {
+    #game-grid {
+        font-size: 2rem;
+    }
 }

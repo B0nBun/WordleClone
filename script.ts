@@ -3,7 +3,7 @@ const includes = <T>(arr : Array<T>, elem : T) : boolean => arr.some(e => e === 
 
 /* Types and interfaces */
 
-type BlockState = 'empty' | 'open' | 'yellow' | 'green'
+type BlockState = 'empty' | 'open' | 'present' | 'correct'
 
 /* Game constants */
 const WORDS = [
@@ -24,6 +24,7 @@ console.log(ANSWER)
 // TODO: Stats screen on end of the game
 // TODO: Screen keyboard
 // TODO: Updating the word every 24h
+// TODO: Opening letters sequentially
 
 
 // The representation of DIV in grid
@@ -100,7 +101,7 @@ class GameGrid {
             { this.handleError('Words can be only length of 5'); return }
 
         if (letter.length !== 1) throw new Error(`addLetter accepts only one letter, '${letter}' was passed`)
-        this.setCurrentWord(this.currentWord + letter)
+        this.setCurrentWord(this.currentWord + letter.toLowerCase())
     }
 
     enterWord() {
@@ -119,9 +120,9 @@ class GameGrid {
         let row = this.wordMatrix[this.attempts.length]
         this.currentWord.split('').forEach((letter, idx) => {
             if (letter === ANSWER[idx]) 
-                { row[idx].setState('green'); return }
+                { row[idx].setState('correct'); return }
             if (includes(ANSWER.split(''), letter))
-                { row[idx].setState('yellow'); return }
+                { row[idx].setState('present'); return }
         })
         this.attempts.push(this.currentWord)
         this.setCurrentWord('')
