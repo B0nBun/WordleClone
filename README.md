@@ -1,6 +1,6 @@
 # Wordle Clone
 
-This is a copy of [Wordle](https://www.powerlanguage.co.uk/wordle/) written on with [TypeScript](https://www.typescriptlang.org/)
+This is a copy of [Wordle](https://www.powerlanguage.co.uk/wordle/) written with [TypeScript](https://www.typescriptlang.org/)
 
 ## Quickstart
 
