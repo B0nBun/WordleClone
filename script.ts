@@ -1,3 +1,11 @@
+/* Utilities */
+const includes = <T>(arr : Array<T>, elem : T) : boolean => arr.some(e => e === elem)
+
+/* Types and interfaces */
+
+type BlockState = 'empty' | 'open' | 'yellow' | 'green'
+
+/* Game constants */
 const WORDS = [
     'apple',
     'spice',
@@ -10,16 +18,15 @@ const WORDS = [
     'water'
 ]
 
+const ANSWER = WORDS[Math.floor(Math.random() * WORDS.length)]
+console.log(ANSWER)
+
 // TODO: Stats screen on end of the game
 // TODO: Screen keyboard
 // TODO: Updating the word every 24h
 
-const ANSWER = WORDS[Math.floor(Math.random() * WORDS.length)]
-console.log(ANSWER)
 
-const includes = <T>(arr : Array<T>, elem : T) : boolean => arr.some(e => e === elem)
-
-type BlockState = 'empty' | 'open' | 'yellow' | 'green'
+// The representation of DIV in grid
 class LetterBlock {
     blockElement : HTMLElement
     
@@ -72,7 +79,6 @@ class GameGrid {
     }
 
     setCurrentWord(word : string) {
-        console.log(word)
         this.currentWord = word
         let row = this.wordMatrix[this.attempts.length]
         row.forEach((block, idx) => block.setLetter(idx < word.length ? word[idx] : ''))
@@ -84,42 +90,32 @@ class GameGrid {
     }
     
     addLetter(letter : string) {
-        if (!letter.match(/[a-zA-Z]/)) {
-            this.handleError('Only latin letters are allowed')
-            return
-        }
-        if (this.currentWord.length >= 5) { 
-            this.handleError('Words can be only length of 5') 
-            return
-        }
+        if (!letter.match(/[a-zA-Z]/))
+            { this.handleError('Only latin letters are allowed'); return }
+        if (this.currentWord.length >= 5)
+            { this.handleError('Words can be only length of 5'); return }
+
         if (letter.length !== 1) throw new Error(`addLetter accepts only one letter, '${letter}' was passed`)
-        let row = this.wordMatrix[this.attempts.length]
         this.setCurrentWord(this.currentWord + letter)
     }
 
     enterWord() {
-        if (this.currentWord.length < 5) {
-            this.handleError('Words can be noly length of 5')
-            return
-        }
-        if (!includes(WORDS, this.currentWord)) {
-            this.handleError(`Invalid word ${this.currentWord}`)
-            return
-        }
+        if (this.currentWord.length < 5) 
+            { this.handleError('Words can be noly length of 5'); return }
+        if (!includes(WORDS, this.currentWord)) 
+            { this.handleError(`Invalid word ${this.currentWord}`); return }
+            
         if (this.currentWord === ANSWER) {
             console.log('WIN')
             // TODO: Block adding letters
         }
+
         let row = this.wordMatrix[this.attempts.length]
         this.currentWord.split('').forEach((letter, idx) => {
-            if (letter === ANSWER[idx]) {
-                row[idx].setState('green')
-                return
-            }
-            if (includes(ANSWER.split(''), letter)) {
-                row[idx].setState('yellow')
-                return
-            }
+            if (letter === ANSWER[idx]) 
+                { row[idx].setState('green'); return }
+            if (includes(ANSWER.split(''), letter))
+                { row[idx].setState('yellow'); return }
         })
         this.attempts.push(this.currentWord)
         this.setCurrentWord('')
