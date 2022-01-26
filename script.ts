@@ -56,11 +56,13 @@ class GameGrid {
     attempts : string[]
     currentWord : string
     wordMatrix : LetterBlock[][]
+    didGameEnd :  boolean
 
     constructor(gridElement : HTMLElement) {
         this.gridElement = gridElement
         this.attempts = []
         this.currentWord = ''
+        this.didGameEnd = false
         const numberOfAttempts = 6
         const rowClass = 'word-row'
 
@@ -90,6 +92,8 @@ class GameGrid {
     }
     
     addLetter(letter : string) {
+        if (this.didGameEnd)
+            { this.handleError('The game is already finished'); return }
         if (!letter.match(/[a-zA-Z]/))
             { this.handleError('Only latin letters are allowed'); return }
         if (this.currentWord.length >= 5)
@@ -100,6 +104,8 @@ class GameGrid {
     }
 
     enterWord() {
+        if (this.didGameEnd)
+            { this.handleError('The game is already finished'); return }
         if (this.currentWord.length < 5) 
             { this.handleError('Words can be noly length of 5'); return }
         if (!includes(WORDS, this.currentWord)) 
@@ -107,7 +113,7 @@ class GameGrid {
             
         if (this.currentWord === ANSWER) {
             console.log('WIN')
-            // TODO: Block adding letters
+            this.didGameEnd = true
         }
 
         let row = this.wordMatrix[this.attempts.length]
@@ -121,7 +127,7 @@ class GameGrid {
         this.setCurrentWord('')
         if (this.attempts.length >= this.wordMatrix.length) {
             console.log('LOSE')
-            // TODO: Block adding letters
+            this.didGameEnd = false
         }
     }
 
