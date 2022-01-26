@@ -32,8 +32,7 @@ class LetterBlock {
     }
 
     setLetter(letter: string) {
-        if (letter.length !== 1) throw new Error(`setLetter accepts only one letter, '${letter}' was given`)
-        console.log(this.blockElement)
+        if (letter.length > 1) throw new Error(`setLetter accepts only one or zero letters, '${letter}' was given`)
         this.blockElement.dataset.state = 'open'
         this.blockElement.innerHTML = letter
         return this
@@ -71,6 +70,13 @@ class GameGrid {
             }
         }
     }
+
+    setCurrentWord(word : string) {
+        console.log(word)
+        this.currentWord = word
+        let row = this.wordMatrix[this.attempts.length]
+        row.forEach((block, idx) => block.setLetter(idx < word.length ? word[idx] : ''))
+    }
     
     handleError(message : string) {
         // TODO: Some kind of notification system
@@ -88,8 +94,7 @@ class GameGrid {
         }
         if (letter.length !== 1) throw new Error(`addLetter accepts only one letter, '${letter}' was passed`)
         let row = this.wordMatrix[this.attempts.length]
-        row.map((block, idx) => idx === this.currentWord.length ? block.setLetter(letter) : block)
-        this.currentWord += letter
+        this.setCurrentWord(this.currentWord + letter)
     }
 
     enterWord() {
@@ -117,7 +122,7 @@ class GameGrid {
             }
         })
         this.attempts.push(this.currentWord)
-        this.currentWord = ''
+        this.setCurrentWord('')
         if (this.attempts.length >= this.wordMatrix.length) {
             console.log('LOSE')
             // TODO: Block adding letters
@@ -125,7 +130,7 @@ class GameGrid {
     }
 
     removeLetter() {
-        // TODO
+        this.setCurrentWord(this.currentWord.substring(0, this.currentWord.length - 1))
     }
 }
 
@@ -134,6 +139,10 @@ const gameGrid = new GameGrid(document.getElementById('game-grid'))
 window.addEventListener('keyup', e => {
     if (!e.key.match(/[A-Za-z]/) || e.key.length !== 1) return
     gameGrid.addLetter(e.key)    
+})
+
+window.addEventListener('keyup', e => {
+    if (e.key === 'Backspace') gameGrid.removeLetter()
 })
 
 window.addEventListener('keydown', e => {
