@@ -37,8 +37,14 @@ body {
 #game-grid {
     display: grid;
     grid-template-rows: repeat(6, minmax(1.25em, 1.6em));
-    font-size: 2.5rem;
+    font-size: 2.2rem;
     gap: .5em;
+}
+
+@media (max-width: 20rem) {
+    #game-grid {
+        font-size: 2rem;
+    }
 }
 
 .word-row {
@@ -71,8 +77,25 @@ body {
     border: none;
 }
 
-@media (max-width: 20rem) {
-    #game-grid {
-        font-size: 2rem;
-    }
+/* TODO: Make keyboard responsive */
+#keyboard {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: .2em;
+    font-size: 1.5rem;
+}
+
+.keyboard-row {
+    gap: .2em;
+    display: flex;
+    flex-direction: row;
+}
+
+.keyboard-button {
+    background-color: var(--foreground2);
+    color: var(--foreground0);
+    padding: .5em;
+    cursor: pointer;
+    border-radius: .2em;
 }

@@ -42,7 +42,7 @@ class LetterBlock {
     setLetter(letter: string) {
         if (letter.length > 1) throw new Error(`setLetter accepts only one or zero letters, '${letter}' was given`)
         this.blockElement.dataset.state = 'open'
-        this.blockElement.innerHTML = letter
+        this.blockElement.textContent = letter
         return this
     }
 
@@ -152,3 +152,32 @@ window.addEventListener('keydown', e => {
     if (e.key === "Enter") 
         gameGrid.enterWord()
 })
+
+/* Screen keyboard setup */
+
+const keyboard = document.getElementById('keyboard')
+
+function generateRow(buttons : string[]) : void {
+    const row = document.createElement('div')
+    row.classList.add('keyboard-row')
+    
+    buttons.forEach(btn => {
+        const elem = document.createElement('div')
+        elem.classList.add('keyboard-button')
+        elem.textContent = btn
+        elem.addEventListener('click', e => {
+            if (elem.textContent === '<')
+                { gameGrid.removeLetter(); return }
+            if (elem.textContent === 'enter')
+                {gameGrid.enterWord(); return}
+            gameGrid.addLetter(elem.textContent)
+        })
+        row.appendChild(elem)    
+    })
+
+    keyboard.appendChild(row)
+}
+
+generateRow('qwertyuiop'.split(''))
+generateRow('asdfghjkl'.split(''))
+generateRow(['enter', ...'zxcvbnm'.split(''), '<'])
