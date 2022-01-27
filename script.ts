@@ -6,6 +6,7 @@ const includes = <T>(arr : Array<T>, elem : T) : boolean => arr.some(e => e === 
 type BlockState = 'empty' | 'open' | 'present' | 'correct'
 
 /* Game constants */
+// TODO: More words
 const WORDS = [
     'apple',
     'spice',
@@ -40,7 +41,10 @@ class LetterBlock {
 
     setLetter(letter: string) {
         if (letter.length > 1) throw new Error(`setLetter accepts only one or zero letters, '${letter}' was given`)
-        this.blockElement.dataset.state = 'open'
+        if (letter !== '')
+            this.blockElement.dataset.state = 'open'
+        else
+            this.blockElement.dataset.state = 'empty'
         this.blockElement.textContent = letter
         return this
     }
@@ -152,6 +156,7 @@ window.addEventListener('keydown', e => {
         gameGrid.enterWord()
 })
 
+// TODO: Display used, present and correct letters on the keyboard
 /* Screen keyboard setup */
 
 const keyboard = document.getElementById('keyboard')

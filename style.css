@@ -72,16 +72,72 @@ body {
     justify-content: center;
 }
 
+@keyframes letter-entering {
+    0% {
+        transform: scale(1);
+    }
+
+    80% {
+        transform: scale(1.05);
+    }
+
+    100% {
+        transform: scale(1);
+    }
+}
+
+.letter-block[data-state="open"] {
+    animation: letter-entering .1s ease-out;
+}
+
+@keyframes letter-opening-present {
+    0% {transform: scaleY(1);}
+
+    49% {background-color: transparent;}
+
+    50% {
+        transform: scaleY(0);
+        background-color: var(--present);
+        color: var(--foreground0);
+        border-color: transparent;
+    }
+    
+    100% {
+        transform: scaleY(1);
+        background-color: var(--present);
+        color: var(--foreground0);
+        border-color: transparent;
+    }
+}
+
 .letter-block[data-state="present"] {
-    background-color: var(--present);
-    color: var(--foreground0);
-    border: none;
+    animation: letter-opening-present .5s ease-out;
+    animation-fill-mode: forwards;
+}
+
+@keyframes letter-opening-correct {
+    0% {transform: scaleY(1);}
+
+    49% {background-color: transparent;}
+    
+    50% {
+        transform: scaleY(0);
+        background-color: var(--correct);
+        color: var(--foreground0);
+        border-color: transparent;
+    }
+    
+    100% {
+        transform: scaleY(1);
+        background-color: var(--correct);
+        color: var(--foreground0);
+        border-color: transparent;
+    }
 }
 
 .letter-block[data-state="correct"] {
-    background-color: var(--correct);
-    color: var(--foreground0);
-    border: none;
+    animation: letter-opening-correct .5s ease-out;
+    animation-fill-mode: forwards;
 }
 
 #keyboard {
