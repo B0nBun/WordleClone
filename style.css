@@ -180,5 +180,18 @@ body {
 }
 
 .keyboard-button:hover {
-    background-color: var(--foreground1);
+    filter: brightness(1.1);
+}
+
+.keyboard-button[data-state="correct"] {
+    background-color: var(--correct);
+}
+
+.keyboard-button[data-state="present"] {
+    background-color: var(--present);
+}
+
+.keyboard-button[data-state="open"] {
+    background-color: var(--background);
+    outline: 2px solid var(--foreground2);
 }

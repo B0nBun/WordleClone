@@ -61,12 +61,14 @@ class GameGrid {
     currentWord : string
     wordMatrix : LetterBlock[][]
     didGameEnd :  boolean
+    enterWordCallbacks : ((currentWord : string) => void)[]
 
     constructor(gridElement : HTMLElement) {
         this.gridElement = gridElement
         this.attempts = []
         this.currentWord = ''
         this.didGameEnd = false
+        this.enterWordCallbacks = []
         const numberOfAttempts = 6
         const rowClass = 'word-row'
 
@@ -127,12 +129,20 @@ class GameGrid {
             if (includes(ANSWER.split(''), letter))
                 { row[idx].setState('present'); return }
         })
+
+        // Calling subscribed functions
+        this.enterWordCallbacks.forEach(callback => callback(this.currentWord))
+
         this.attempts.push(this.currentWord)
         this.setCurrentWord('')
         if (this.attempts.length >= this.wordMatrix.length) {
             console.log('LOSE')
             this.didGameEnd = false
         }
+    }
+
+    subscribeToEnterWord(callback : (currentWord : string) => void) {
+        this.enterWordCallbacks.push(callback)
     }
 
     removeLetter() {
@@ -160,6 +170,7 @@ window.addEventListener('keydown', e => {
 /* Screen keyboard setup */
 
 const keyboard = document.getElementById('keyboard')
+const keyboardMatrix = {}
 
 function generateRow(buttons : string[], rowid : number) : void {
     const row = document.createElement('div')
@@ -178,6 +189,8 @@ function generateRow(buttons : string[], rowid : number) : void {
             gameGrid.addLetter(elem.textContent)
         })
         row.appendChild(elem)    
+
+        keyboardMatrix[btn] = elem
     })
 
     keyboard.appendChild(row)
@@ -186,3 +199,18 @@ function generateRow(buttons : string[], rowid : number) : void {
 generateRow('qwertyuiop'.split(''), 1)
 generateRow('asdfghjkl'.split(''), 2)
 generateRow(['enter', ...'zxcvbnm'.split(''), '<'], 3)
+
+/* Displaying used letters on a keyboard */
+
+gameGrid.subscribeToEnterWord((word : string) : void => {
+    word.split('').forEach((letter, idx) => {
+        let btnElem : HTMLElement = keyboardMatrix[letter]
+        if (!btnElem) return
+        
+        if (letter === ANSWER[idx]) 
+            { btnElem.dataset.state = 'correct'; return }
+        if (includes(ANSWER.split(''), letter))
+            { btnElem.dataset.state = 'present'; return }
+        btnElem.dataset.state = 'open'
+    })
+})
