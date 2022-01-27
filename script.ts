@@ -1,9 +1,11 @@
 /* Utilities */
 const includes = <T>(arr : Array<T>, elem : T) : boolean => arr.some(e => e === elem)
+const sleep = (ms : number) : Promise<void> => new Promise(r => setTimeout(r, ms))
 
 /* Types and interfaces */
 
 type BlockState = 'empty' | 'open' | 'present' | 'correct'
+type KeyboardObjectType = {[key : string] : HTMLElement}
 
 /* Game constants */
 // TODO: More words
@@ -109,7 +111,7 @@ class GameGrid {
         this.setCurrentWord(this.currentWord + letter.toLowerCase())
     }
 
-    enterWord() {
+    async enterWord() {
         if (this.didGameEnd)
             { this.handleError('The game is already finished'); return }
         if (this.currentWord.length < 5) 
@@ -122,13 +124,24 @@ class GameGrid {
             this.didGameEnd = true
         }
 
-        let row = this.wordMatrix[this.attempts.length]
-        this.currentWord.split('').forEach((letter, idx) => {
-            if (letter === ANSWER[idx]) 
-                { row[idx].setState('correct'); return }
-            if (includes(ANSWER.split(''), letter))
-                { row[idx].setState('present'); return }
-        })
+        // TODO: Seperate `entered` and `opened` letter states
+        //      entered - letter was entered (obviously)
+        //      opened - word was entered fully and the letter is now opened
+        //      Add animations for both
+        let row = this.wordMatrix[this.attempts.length];
+        for (let idx = 0; idx < this.currentWord.split('').length; idx ++) {
+            await sleep(200)
+            const letter = this.currentWord.split('')[idx]
+            if (letter === ANSWER[idx]) {
+                row[idx].setState('correct')
+                continue
+            }
+            if (includes(ANSWER.split(''), letter)) {
+                row[idx].setState('present')
+                continue
+            }
+            row[idx].setState('open')
+        }
 
         // Calling subscribed functions
         this.enterWordCallbacks.forEach(callback => callback(this.currentWord))
@@ -150,7 +163,7 @@ class GameGrid {
     }
 }
 
-const gameGrid = new GameGrid(document.getElementById('game-grid'))
+const gameGrid = new GameGrid(document.getElementById('game-grid')!)
 
 window.addEventListener('keyup', e => {
     if (!e.key.match(/[A-Za-z]/) || e.key.length !== 1) return
@@ -169,8 +182,8 @@ window.addEventListener('keydown', e => {
 // TODO: Display used, present and correct letters on the keyboard
 /* Screen keyboard setup */
 
-const keyboard = document.getElementById('keyboard')
-const keyboardMatrix = {}
+const keyboard = document.getElementById('keyboard')!
+const keyboardMatrix : KeyboardObjectType = {}
 
 function generateRow(buttons : string[], rowid : number) : void {
     const row = document.createElement('div')
@@ -186,7 +199,7 @@ function generateRow(buttons : string[], rowid : number) : void {
                 { gameGrid.removeLetter(); return }
             if (elem.textContent === 'enter')
                 {gameGrid.enterWord(); return}
-            gameGrid.addLetter(elem.textContent)
+            gameGrid.addLetter(elem.textContent || '')
         })
         row.appendChild(elem)    
 
@@ -206,7 +219,7 @@ gameGrid.subscribeToEnterWord((word : string) : void => {
     word.split('').forEach((letter, idx) => {
         let btnElem : HTMLElement = keyboardMatrix[letter]
         if (!btnElem) return
-        
+
         if (letter === ANSWER[idx]) 
             { btnElem.dataset.state = 'correct'; return }
         if (includes(ANSWER.split(''), letter))
