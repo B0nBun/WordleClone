@@ -4,7 +4,7 @@ const sleep = (ms : number) : Promise<void> => new Promise(r => setTimeout(r, ms
 
 /* Types and interfaces */
 
-type BlockState = 'empty' | 'open' | 'present' | 'correct'
+type BlockState = 'empty' | 'entered' | 'opened' | 'present' | 'correct'
 type KeyboardObjectType = {[key : string] : HTMLElement}
 
 /* Game constants */
@@ -44,7 +44,7 @@ class LetterBlock {
     setLetter(letter: string) {
         if (letter.length > 1) throw new Error(`setLetter accepts only one or zero letters, '${letter}' was given`)
         if (letter !== '')
-            this.blockElement.dataset.state = 'open'
+            this.blockElement.dataset.state = 'opened'
         else
             this.blockElement.dataset.state = 'empty'
         this.blockElement.textContent = letter
@@ -123,11 +123,7 @@ class GameGrid {
             console.log('WIN')
             this.didGameEnd = true
         }
-
-        // TODO: Seperate `entered` and `opened` letter states
-        //      entered - letter was entered (obviously)
-        //      opened - word was entered fully and the letter is now opened
-        //      Add animations for both
+        
         let row = this.wordMatrix[this.attempts.length];
         for (let idx = 0; idx < this.currentWord.split('').length; idx ++) {
             await sleep(200)
@@ -140,7 +136,7 @@ class GameGrid {
                 row[idx].setState('present')
                 continue
             }
-            row[idx].setState('open')
+            row[idx].setState('entered')
         }
 
         // Calling subscribed functions
@@ -179,7 +175,6 @@ window.addEventListener('keydown', e => {
         gameGrid.enterWord()
 })
 
-// TODO: Display used, present and correct letters on the keyboard
 /* Screen keyboard setup */
 
 const keyboard = document.getElementById('keyboard')!
@@ -192,6 +187,7 @@ function generateRow(buttons : string[], rowid : number) : void {
     
     buttons.forEach(btn => {
         const elem = document.createElement('div')
+        elem.tabIndex = 0;
         elem.classList.add('keyboard-button')
         elem.textContent = btn
         elem.addEventListener('click', e => {
@@ -224,6 +220,6 @@ gameGrid.subscribeToEnterWord((word : string) : void => {
             { btnElem.dataset.state = 'correct'; return }
         if (includes(ANSWER.split(''), letter))
             { btnElem.dataset.state = 'present'; return }
-        btnElem.dataset.state = 'open'
+        btnElem.dataset.state = 'entered'
     })
 })

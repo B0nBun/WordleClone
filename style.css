@@ -1,10 +1,11 @@
 :root {
-    --background: #1f1f1f;
     --present: gold;
     --correct: lightgreen;
-    --foreground2: #808680;
-    --foreground1: #b0b6b0;
-    --foreground0: #f0f6f0;
+    --background: #0f0f0f;
+    --foreground0: #212121;
+    --foreground1: #303030;
+    --foreground2: #424242;
+    --foreground3: #f0f6f0;
 }
 
 *, *::after, *::before {
@@ -65,14 +66,14 @@ body {
     min-height: 1.25em;
     border: 2px solid var(--foreground1);
     border-radius: .2rem;
-    color: var(--foreground0);
+    color: var(--foreground3);
 
     display: flex;
     align-items: center;
     justify-content: center;
 }
 
-@keyframes letter-entering {
+@keyframes letter-opening {
     0% {
         transform: scale(1);
     }
@@ -86,8 +87,32 @@ body {
     }
 }
 
-.letter-block[data-state="open"] {
-    animation: letter-entering .1s ease-out;
+.letter-block[data-state="opened"] {
+    animation: letter-opening .1s ease-out;
+}
+
+@keyframes letter-entering {
+    0% {transform: scaleY(1);}
+
+    49% {background-color: transparent;}
+
+    50% {
+        transform: scaleY(0);
+        background-color: var(--foreground0);
+        color: var(--foreground3);
+        border-color: transparent;
+    }
+    
+    100% {
+        transform: scaleY(1);
+        background-color: var(--foreground0);
+        color: var(--foreground3);
+        border-color: transparent;
+    }
+}
+
+.letter-block[data-state="entered"] {
+    animation: letter-entering .5s ease-out forwards;
 }
 
 @keyframes letter-opening-present {
@@ -98,21 +123,20 @@ body {
     50% {
         transform: scaleY(0);
         background-color: var(--present);
-        color: var(--foreground0);
+        color: var(--foreground3);
         border-color: transparent;
     }
     
     100% {
         transform: scaleY(1);
         background-color: var(--present);
-        color: var(--foreground0);
+        color: var(--foreground3);
         border-color: transparent;
     }
 }
 
 .letter-block[data-state="present"] {
-    animation: letter-opening-present .5s ease-out;
-    animation-fill-mode: forwards;
+    animation: letter-opening-present .5s ease-out forwards;
 }
 
 @keyframes letter-opening-correct {
@@ -123,21 +147,20 @@ body {
     50% {
         transform: scaleY(0);
         background-color: var(--correct);
-        color: var(--foreground0);
+        color: var(--foreground3);
         border-color: transparent;
     }
     
     100% {
         transform: scaleY(1);
         background-color: var(--correct);
-        color: var(--foreground0);
+        color: var(--foreground3);
         border-color: transparent;
     }
 }
 
 .letter-block[data-state="correct"] {
-    animation: letter-opening-correct .5s ease-out;
-    animation-fill-mode: forwards;
+    animation: letter-opening-correct .5s ease-out forwards;
 }
 
 #keyboard {
@@ -168,9 +191,9 @@ body {
 .keyboard-button {
     user-select: none;
     background-color: var(--foreground2);
-    color: var(--foreground0);
-    padding-top: .5em;
-    padding-bottom: .5em; 
+    color: var(--foreground3);
+    font-weight: 300;
+    padding: .5em .1em;
     width: 100%;
     cursor: pointer;
     border-radius: .2em;
@@ -179,8 +202,10 @@ body {
     justify-content: center;
 }
 
-.keyboard-button:hover {
-    filter: brightness(1.1);
+
+.keyboard-button:hover,
+.keyboard-button:focus {
+    filter: brightness(1.2);
 }
 
 .keyboard-button[data-state="correct"] {
@@ -191,7 +216,6 @@ body {
     background-color: var(--present);
 }
 
-.keyboard-button[data-state="open"] {
-    background-color: var(--background);
-    outline: 2px solid var(--foreground2);
+.keyboard-button[data-state="entered"] {
+    background-color: var(--foreground0);
 }
