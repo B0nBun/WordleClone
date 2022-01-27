@@ -22,7 +22,6 @@ const ANSWER = WORDS[Math.floor(Math.random() * WORDS.length)]
 console.log(ANSWER)
 
 // TODO: Stats screen on end of the game
-// TODO: Screen keyboard
 // TODO: Updating the word every 24h
 // TODO: Opening letters sequentially
 
@@ -157,9 +156,10 @@ window.addEventListener('keydown', e => {
 
 const keyboard = document.getElementById('keyboard')
 
-function generateRow(buttons : string[]) : void {
+function generateRow(buttons : string[], rowid : number) : void {
     const row = document.createElement('div')
     row.classList.add('keyboard-row')
+    row.id = `row_${rowid}`
     
     buttons.forEach(btn => {
         const elem = document.createElement('div')
@@ -178,6 +178,6 @@ function generateRow(buttons : string[]) : void {
     keyboard.appendChild(row)
 }
 
-generateRow('qwertyuiop'.split(''))
-generateRow('asdfghjkl'.split(''))
-generateRow(['enter', ...'zxcvbnm'.split(''), '<'])
+generateRow('qwertyuiop'.split(''), 1)
+generateRow('asdfghjkl'.split(''), 2)
+generateRow(['enter', ...'zxcvbnm'.split(''), '<'], 3)

@@ -29,14 +29,21 @@ body {
     max-width: 60rem;
     padding: 2rem;
     margin: 0 auto;
-    display: flex;
-    flex-direction: column;
-    align-items: center;
+    display: grid;
+    grid-template-areas:
+        "gamegrid"
+        "keyboard";
+    gap: 1rem;
+    justify-content: center;
+    align-items: flex-start;
+    max-height: 100vh;
 }
 
 #game-grid {
+    grid-area: gamegrid;
     display: grid;
-    grid-template-rows: repeat(6, minmax(1.25em, 1.6em));
+    justify-content: center;
+    grid-template-rows: repeat(6, 1.6em);
     font-size: 2.2rem;
     gap: .5em;
 }
@@ -77,25 +84,45 @@ body {
     border: none;
 }
 
-/* TODO: Make keyboard responsive */
 #keyboard {
-    display: flex;
-    flex-direction: column;
-    align-items: center;
+    max-width: 40rem;
+    grid-area: keyboard;
+    display: grid;
+    grid-template-rows: repeat(3, 1fr);
     gap: .2em;
     font-size: 1.5rem;
 }
 
 .keyboard-row {
     gap: .2em;
-    display: flex;
-    flex-direction: row;
+    display: grid;
+}
+
+#row_1 {
+    grid-template-columns: repeat(10, 1fr);
+}
+#row_2 {
+    padding: 0 1ch;
+    grid-template-columns: repeat(9, 1fr);
+}
+#row_3 {
+    grid-template-columns: 2fr repeat(7, 1fr) 2fr;
 }
 
 .keyboard-button {
+    user-select: none;
     background-color: var(--foreground2);
     color: var(--foreground0);
-    padding: .5em;
+    padding-top: .5em;
+    padding-bottom: .5em; 
+    width: 100%;
     cursor: pointer;
     border-radius: .2em;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+}
+
+.keyboard-button:hover {
+    background-color: var(--foreground1);
 }
