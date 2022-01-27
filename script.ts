@@ -123,30 +123,33 @@ class GameGrid {
             console.log('WIN')
             this.didGameEnd = true
         }
-        
-        let row = this.wordMatrix[this.attempts.length];
-        for (let idx = 0; idx < this.currentWord.split('').length; idx ++) {
-            await sleep(200)
-            const letter = this.currentWord.split('')[idx]
-            if (letter === ANSWER[idx]) {
-                row[idx].setState('correct')
-                continue
-            }
-            if (includes(ANSWER.split(''), letter)) {
-                row[idx].setState('present')
-                continue
-            }
-            row[idx].setState('entered')
-        }
+
+        let prevRow = this.wordMatrix[this.attempts.length];
+        let prevWord = this.currentWord
 
         // Calling subscribed functions
         this.enterWordCallbacks.forEach(callback => callback(this.currentWord))
 
         this.attempts.push(this.currentWord)
-        this.setCurrentWord('')
         if (this.attempts.length >= this.wordMatrix.length) {
             console.log('LOSE')
-            this.didGameEnd = false
+            this.didGameEnd = true
+        }
+        if (!this.didGameEnd) this.setCurrentWord('')
+        
+        // We start animations only after resetting everything, so that the inputs are not blocked 
+        for (let idx = 0; idx < prevWord.split('').length; idx ++) {
+            await sleep(200)
+            const letter = prevWord.split('')[idx]
+            if (letter === ANSWER[idx]) {
+                prevRow[idx].setState('correct')
+                continue
+            }
+            if (includes(ANSWER.split(''), letter)) {
+                prevRow[idx].setState('present')
+                continue
+            }
+            prevRow[idx].setState('entered')
         }
     }
 
