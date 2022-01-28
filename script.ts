@@ -1,13 +1,3 @@
-/* Utilities */
-const includes = <T>(arr : Array<T>, elem : T) : boolean => arr.some(e => e === elem)
-const sleep = (ms : number) : Promise<void> => new Promise(r => setTimeout(r, ms))
-
-/* Types and interfaces */
-
-type BlockState = 'empty' | 'entered' | 'opened' | 'present' | 'correct'
-type KeyboardObjectType = {[key : string] : HTMLElement}
-
-/* Game constants */
 // TODO: More words
 const WORDS = [
     'apple',
@@ -21,13 +11,44 @@ const WORDS = [
     'water'
 ]
 
-const ANSWER = WORDS[Math.floor(Math.random() * WORDS.length)]
+/* Types and interfaces */
+
+type BlockState = 'empty' | 'entered' | 'opened' | 'present' | 'correct'
+type KeyboardObjectType = {[key : string] : HTMLElement}
+
+/* Utilities */
+const includes = <T>(arr : Array<T>, elem : T) : boolean => arr.some(e => e === elem)
+const sleep = (ms : number) : Promise<void> => new Promise(r => setTimeout(r, ms))
+
+const getWordIndex = () => Number(localStorage.getItem('wordIdx'))
+const updateWordIndex = () => localStorage.setItem('wordIdx', String(Math.floor(Math.random() * WORDS.length)))
+
+const updateLastUpdated = () => {
+    localStorage.setItem('lastUpdated', String(Math.floor((new Date()).getTime() / 1000)))
+}
+
+const getLastUpdated = () => {
+    let lastUpdated = localStorage.getItem('lastUpdated')
+    if (!lastUpdated) updateLastUpdated()
+    return Number(localStorage.getItem('lastUpdated')!)
+}
+
+const checkLastUpdated = () => {
+    let current = Math.floor((new Date()).getTime() / 1000)
+    // Checking if last update was 24h ago
+    if ((current - getLastUpdated()) / 60 / 60 / 24 > 1 || getWordIndex() === undefined) {
+        updateWordIndex()
+        updateLastUpdated()
+    }
+}
+
+checkLastUpdated()
+
+const ANSWER = WORDS[getWordIndex()]
 console.log(ANSWER)
 
 // TODO: Stats screen on end of the game
-// TODO: Updating the word every 24h
-// TODO: Opening letters sequentially
-
+// TODO: Lock the game after first `win` or 'lose' of the day
 
 // The representation of DIV in grid
 class LetterBlock {
