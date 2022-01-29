@@ -39,8 +39,12 @@ const checkLastUpdated = () => {
     if ((current - getLastUpdated()) / 60 / 60 / 24 > 1 || getWordIndex() === undefined) {
         updateWordIndex()
         updateLastUpdated()
+        setAttempts([])
     }
 }
+
+const setAttempts = (attempts : string[]) => localStorage.setItem('attempts', JSON.stringify(attempts))
+const getAttempts = () : string[] => JSON.parse(localStorage.getItem('attempts') || '[]')
 
 checkLastUpdated()
 
@@ -49,6 +53,12 @@ console.log(ANSWER)
 
 // TODO: Stats screen on end of the game
 // TODO: Lock the game after first `win` or 'lose' of the day
+// TODO: Check for `win` or `lose` on page start
+// TODOBUG: Maintain the `correct` state on screen keyboard even if the last guess of letter was `present`
+//          Correct: house
+//          Guess1: apple  (e - correct)
+//          Guess2: power  (e switches to `present`, even though it should stay at `correct`)
+// TODOBUG: Fix bug where you can simultaneously lose and win if you guess during last attempt
 
 // The representation of DIV in grid
 class LetterBlock {
@@ -86,9 +96,9 @@ class GameGrid {
     didGameEnd :  boolean
     enterWordCallbacks : ((currentWord : string) => void)[]
 
-    constructor(gridElement : HTMLElement) {
+    constructor(gridElement : HTMLElement, attempts : string[]) {
         this.gridElement = gridElement
-        this.attempts = []
+        this.attempts = attempts
         this.currentWord = ''
         this.didGameEnd = false
         this.enterWordCallbacks = []
@@ -107,6 +117,8 @@ class GameGrid {
                 this.wordMatrix[y].push(new LetterBlock(elem))
             }
         }
+
+        attempts.forEach((word, idx) => this.openWord(idx, word))
     }
 
     setCurrentWord(word : string) {
@@ -132,6 +144,27 @@ class GameGrid {
         this.setCurrentWord(this.currentWord + letter.toLowerCase())
     }
 
+    async openWord(wordIdx : number, word : string) {
+        const row = this.wordMatrix[wordIdx]
+        const letters = word.split('')
+        // Setting all letters beforehand, so that they don't open asynchronously
+        row.forEach((block, idx) => block.setLetter(letters[idx]))
+        
+        for (let idx = 0; idx < word.split('').length; idx ++) {
+            await sleep(200)
+            const letter = letters[idx]
+            if (letter === ANSWER[idx]) {
+                row[idx].setState('correct')
+                continue
+            }
+            if (includes(ANSWER.split(''), letter)) {
+                row[idx].setState('present')
+                continue
+            }
+            row[idx].setState('entered')
+        }
+    }
+    
     async enterWord() {
         if (this.didGameEnd)
             { this.handleError('The game is already finished'); return }
@@ -145,13 +178,14 @@ class GameGrid {
             this.didGameEnd = true
         }
 
-        let prevRow = this.wordMatrix[this.attempts.length];
+        let prevRowIdx = this.attempts.length;
         let prevWord = this.currentWord
 
         // Calling subscribed functions
         this.enterWordCallbacks.forEach(callback => callback(this.currentWord))
 
         this.attempts.push(this.currentWord)
+        setAttempts([...getAttempts(), this.currentWord])
         if (this.attempts.length >= this.wordMatrix.length) {
             console.log('LOSE')
             this.didGameEnd = true
@@ -159,19 +193,7 @@ class GameGrid {
         if (!this.didGameEnd) this.setCurrentWord('')
         
         // We start animations only after resetting everything, so that the inputs are not blocked 
-        for (let idx = 0; idx < prevWord.split('').length; idx ++) {
-            await sleep(200)
-            const letter = prevWord.split('')[idx]
-            if (letter === ANSWER[idx]) {
-                prevRow[idx].setState('correct')
-                continue
-            }
-            if (includes(ANSWER.split(''), letter)) {
-                prevRow[idx].setState('present')
-                continue
-            }
-            prevRow[idx].setState('entered')
-        }
+        this.openWord(prevRowIdx, prevWord)
     }
 
     subscribeToEnterWord(callback : (currentWord : string) => void) {
@@ -183,7 +205,7 @@ class GameGrid {
     }
 }
 
-const gameGrid = new GameGrid(document.getElementById('game-grid')!)
+const gameGrid = new GameGrid(document.getElementById('game-grid')!, getAttempts())
 
 window.addEventListener('keyup', e => {
     if (!e.key.match(/[A-Za-z]/) || e.key.length !== 1) return
