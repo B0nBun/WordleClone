@@ -44,10 +44,7 @@ console.log(ANSWER)
 // TODO: Lock the game after first `win` or 'lose' of the day
 // TODO: Check for `win` or `lose` on page start
 // TODO: `help` and `stats` modal
-// TODOBUG: Maintain the `correct` state on screen keyboard even if the last guess of letter was `present`
-//          Correct: house
-//          Guess1: apple  (e - correct)
-//          Guess2: power  (e switches to `present`, even though it should stay at `correct`)
+// TODOBUG: Load the state of keyboard buttons on the start of the page
 // TODOBUG: Fix bug where you can simultaneously lose and win if you guess during last attempt
 
 // The representation of DIV in grid
@@ -252,7 +249,7 @@ gameGrid.subscribeToEnterWord((word : string) : void => {
         let btnElem : HTMLElement = keyboardMatrix[letter]
         if (!btnElem) return
 
-        if (letter === ANSWER[idx]) 
+        if (letter === ANSWER[idx] || btnElem.dataset.state === 'correct') 
             { btnElem.dataset.state = 'correct'; return }
         if (includes(ANSWER.split(''), letter))
             { btnElem.dataset.state = 'present'; return }
