@@ -26,7 +26,7 @@ const getLastUpdated = () => {
 const checkLastUpdated = () => {
     let current = Math.floor((new Date()).getTime() / 1000)
     // Checking if last update was 24h ago
-    if ((current - getLastUpdated()) / 60 / 60 / 24 > 1 || getWordIndex() === undefined) {
+    if ((current - getLastUpdated()) / 60 / 60 / 24 > 1 || localStorage.getItem('wordIdx') === null) {
         updateWordIndex()
         updateLastUpdated()
         setAttempts([])
@@ -44,7 +44,6 @@ console.log(ANSWER)
 // TODO: Lock the game after first `win` or 'lose' of the day
 // TODO: Check for `win` or `lose` on page start
 // TODO: `help` and `stats` modal
-// TODOBUG: Load the state of keyboard buttons on the start of the page
 // TODOBUG: Fix bug where you can simultaneously lose and win if you guess during last attempt
 
 // The representation of DIV in grid
@@ -173,7 +172,7 @@ class GameGrid {
 
         this.attempts.push(this.currentWord)
         setAttempts([...getAttempts(), this.currentWord])
-        if (this.attempts.length >= this.wordMatrix.length) {
+        if (this.attempts.length >= this.wordMatrix.length && !this.didGameEnd) {
             console.log('LOSE')
             this.didGameEnd = true
         }
