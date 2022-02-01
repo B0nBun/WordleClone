@@ -44,7 +44,6 @@ console.log(ANSWER)
 // TODO: Lock the game after first `win` or 'lose' of the day
 // TODO: Check for `win` or `lose` on page start
 // TODO: `help` and `stats` modal
-// TODOBUG: Fix bug where you can simultaneously lose and win if you guess during last attempt
 
 // The representation of DIV in grid
 class LetterBlock {
