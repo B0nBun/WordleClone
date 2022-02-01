@@ -244,7 +244,7 @@ generateRow(['enter', ...'zxcvbnm'.split(''), '<'], 3)
 
 /* Displaying used letters on a keyboard */
 
-gameGrid.subscribeToEnterWord((word : string) : void => {
+const keyboardLettersStateUpdate = (word : string) : void => {
     word.split('').forEach((letter, idx) => {
         let btnElem : HTMLElement = keyboardMatrix[letter]
         if (!btnElem) return
@@ -255,4 +255,6 @@ gameGrid.subscribeToEnterWord((word : string) : void => {
             { btnElem.dataset.state = 'present'; return }
         btnElem.dataset.state = 'entered'
     })
-})
+}
+gameGrid.attempts.forEach(keyboardLettersStateUpdate)
+gameGrid.subscribeToEnterWord(keyboardLettersStateUpdate)
