@@ -219,3 +219,41 @@ body {
 .keyboard-button[data-state="entered"] {
     background-color: var(--foreground0);
 }
+
+.modal-wrapper {
+    top: 0;
+    left: 0;
+    position: fixed;
+    width: 100vw;
+    height: 100vh;
+    background-color: #000a;
+
+    display: flex;
+    align-items: center;
+    justify-content: center;
+}
+
+.modal {
+    background-color: var(--foreground1);
+    font-size: 2rem;
+    color: var(--foreground3);
+    padding: 1em;
+    border-radius: .2rem;
+
+    display: flex;
+    flex-direction: column;
+    gap: 1em;
+}
+
+.modal-header, .modal-body {
+    text-align: center;
+}
+
+.modal-body {
+    font-size: 1.5em;
+}
+
+.modal-footer {
+    font-size: .5em;
+    opacity: .5;
+}

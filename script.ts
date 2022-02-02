@@ -5,6 +5,7 @@ const WORDS = 'which;there;their;about;would;these;other;words;could;write;first
 
 type BlockState = 'empty' | 'entered' | 'opened' | 'present' | 'correct'
 type KeyboardObjectType = {[key : string] : HTMLElement}
+type IGameStatus = 'won' | 'lost' | 'notfinished'
 
 /* Utilities */
 const includes = <T>(arr : Array<T>, elem : T) : boolean => arr.some(e => e === elem)
@@ -23,27 +24,41 @@ const getLastUpdated = () => {
     return Number(localStorage.getItem('lastUpdated')!)
 }
 
+
+const setGameStatusLS = (status : IGameStatus) : IGameStatus => {
+    localStorage.setItem('gameStatus', status)
+    return status
+}
+
+const getGameStatusLS = () : IGameStatus => {
+    if (!localStorage.getItem('gameStatus')) {
+        return setGameStatusLS('notfinished')
+    }
+    return localStorage.getItem('gameStatus') as IGameStatus
+}
+
 const checkLastUpdated = () => {
     let current = Math.floor((new Date()).getTime() / 1000)
     // Checking if last update was 24h ago
-    if ((current - getLastUpdated()) / 60 / 60 / 24 > 1 || localStorage.getItem('wordIdx') === null) {
+    if ((current - getLastUpdated()) / 60 > 1 || localStorage.getItem('wordIdx') === null) {
         updateWordIndex()
         updateLastUpdated()
         setAttempts([])
+        setGameStatusLS('notfinished')
     }
 }
 
 const setAttempts = (attempts : string[]) => localStorage.setItem('attempts', JSON.stringify(attempts))
 const getAttempts = () : string[] => JSON.parse(localStorage.getItem('attempts') || '[]')
 
-checkLastUpdated()
 
 const ANSWER = WORDS[getWordIndex()]
 console.log(ANSWER)
 
-// TODO: Lock the game after first `win` or 'lose' of the day
 // TODO: Check for `win` or `lose` on page start
 // TODO: `help` and `stats` modal
+// TODO: Some kind of notification system
+// TODO: Modal animations?
 
 // The representation of DIV in grid
 class LetterBlock {
@@ -75,17 +90,19 @@ class LetterBlock {
 
 class GameGrid {
     gridElement : HTMLElement
-    attempts : string[]
+    attempts    : string[]
     currentWord : string
-    wordMatrix : LetterBlock[][]
-    didGameEnd :  boolean
+    wordMatrix  : LetterBlock[][]
+    gameStatus  : IGameStatus
     enterWordCallbacks : ((currentWord : string) => void)[]
 
     constructor(gridElement : HTMLElement, attempts : string[]) {
+        checkLastUpdated()
+
         this.gridElement = gridElement
         this.attempts = attempts
+        this.gameStatus = getGameStatusLS()
         this.currentWord = ''
-        this.didGameEnd = false
         this.enterWordCallbacks = []
         const numberOfAttempts = 6
         const rowClass = 'word-row'
@@ -106,6 +123,10 @@ class GameGrid {
         attempts.forEach((word, idx) => this.openWord(idx, word))
     }
 
+    setStatus(status : IGameStatus) {
+        this.gameStatus = setGameStatusLS(status)
+    }
+
     setCurrentWord(word : string) {
         this.currentWord = word
         let row = this.wordMatrix[this.attempts.length]
@@ -113,12 +134,11 @@ class GameGrid {
     }
     
     handleError(message : string) {
-        // TODO: Some kind of notification system
         console.error(message)
     }
     
     addLetter(letter : string) {
-        if (this.didGameEnd)
+        if (this.gameStatus !== 'notfinished')
             { this.handleError('The game is already finished'); return }
         if (!letter.match(/[a-zA-Z]/))
             { this.handleError('Only latin letters are allowed'); return }
@@ -151,7 +171,7 @@ class GameGrid {
     }
     
     async enterWord() {
-        if (this.didGameEnd)
+        if (this.gameStatus !== 'notfinished')
             { this.handleError('The game is already finished'); return }
         if (this.currentWord.length < 5) 
             { this.handleError('Words can be noly length of 5'); return }
@@ -159,8 +179,8 @@ class GameGrid {
             { this.handleError(`Invalid word ${this.currentWord}`); return }
             
         if (this.currentWord === ANSWER) {
-            console.log('WIN')
-            this.didGameEnd = true
+            console.log('WON')
+            this.setStatus('won')
         }
 
         let prevRowIdx = this.attempts.length;
@@ -171,11 +191,11 @@ class GameGrid {
 
         this.attempts.push(this.currentWord)
         setAttempts([...getAttempts(), this.currentWord])
-        if (this.attempts.length >= this.wordMatrix.length && !this.didGameEnd) {
-            console.log('LOSE')
-            this.didGameEnd = true
+        if (this.attempts.length >= this.wordMatrix.length && this.gameStatus === 'notfinished') {
+            console.log('LOST')
+            this.setStatus('lost')
         }
-        if (!this.didGameEnd) this.setCurrentWord('')
+        if (this.gameStatus === 'notfinished') this.setCurrentWord('')
         
         // We start animations only after resetting everything, so that the inputs are not blocked 
         this.openWord(prevRowIdx, prevWord)
