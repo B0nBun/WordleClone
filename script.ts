@@ -40,7 +40,7 @@ const getGameStatusLS = () : IGameStatus => {
 const checkLastUpdated = () => {
     let current = Math.floor((new Date()).getTime() / 1000)
     // Checking if last update was 24h ago
-    if ((current - getLastUpdated()) / 60 / 60 / 24 > 1 || localStorage.getItem('wordIdx') === null) {
+    if ((current - getLastUpdated()) / 60 / 60 / 24 >= 0.2 || localStorage.getItem('wordIdx') === null) {
         updateWordIndex()
         updateLastUpdated()
         setAttempts([])
@@ -51,13 +51,16 @@ const checkLastUpdated = () => {
 const setAttempts = (attempts : string[]) => localStorage.setItem('attempts', JSON.stringify(attempts))
 const getAttempts = () : string[] => JSON.parse(localStorage.getItem('attempts') || '[]')
 
-
 const ANSWER = WORDS[getWordIndex()]
+console.log(getWordIndex())
 console.log(ANSWER)
 
 // TODO: `help` and `stats` modal
 // TODO: Some kind of notification system
 // TODO: Modal animations?
+// TODO: Better styling for modal
+// TODO: Maybe wait for word opening before opening modal
+// TODOBUG: After finishing game and reloading the page word chages, while still having the same attempts
 
 // The representation of DIV in grid
 class LetterBlock {
@@ -98,7 +101,13 @@ function getFinishModalHTML(isWin : boolean, word : string, attempts : string[])
 }
 
 function openModal(bodyHtml : string) {
-    const closeModal = () => document.body.querySelector('#modal-wrapper')?.remove()
+    const closeModal = () => {
+        const wrapper = document.body.querySelector('#modal-wrapper')
+        wrapper?.classList.add('closed')
+        setTimeout(() => {
+            wrapper?.remove()
+        }, 1100)
+    }
 
     const wrapper = document.createElement('div')
     wrapper.classList.add('modal-wrapper')

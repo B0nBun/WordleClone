@@ -220,6 +220,26 @@ body {
     background-color: var(--foreground0);
 }
 
+@keyframes modal-wrapper {
+    0% {
+        opacity: 0;
+    }
+
+    100% {
+        opacity: 1;
+    }
+}
+
+@keyframes modal-wrapper-closed {
+    0% {
+        opacity: 1;
+    }
+
+    100% {
+        opacity: 0;
+    }
+}
+
 .modal-wrapper {
     top: 0;
     left: 0;
@@ -231,6 +251,26 @@ body {
     display: flex;
     align-items: center;
     justify-content: center;
+
+    animation: modal-wrapper 1s ease-out 1;
+    animation-fill-mode: forwards;
+}
+
+.modal-wrapper.closed {
+    animation: modal-wrapper-closed 1s ease-out 1;
+    animation-fill-mode: forwards;
+}
+
+@keyframes modal-move {
+    0% {
+        opacity: 0;
+        transform: translate(0, -100%);
+    }
+
+    100% {
+        opacity: 1;
+        transform: translate(0, 0);
+    }
 }
 
 .modal {
@@ -243,6 +283,9 @@ body {
     display: flex;
     flex-direction: column;
     gap: 1em;
+
+    animation: modal-move 1s ease-out 1;
+    animation-fill-mode: forwards;
 }
 
 .modal-header, .modal-body {
