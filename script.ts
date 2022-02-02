@@ -40,7 +40,7 @@ const getGameStatusLS = () : IGameStatus => {
 const checkLastUpdated = () => {
     let current = Math.floor((new Date()).getTime() / 1000)
     // Checking if last update was 24h ago
-    if ((current - getLastUpdated()) / 60 > 1 || localStorage.getItem('wordIdx') === null) {
+    if ((current - getLastUpdated()) / 60 / 60 / 24 > 1 || localStorage.getItem('wordIdx') === null) {
         updateWordIndex()
         updateLastUpdated()
         setAttempts([])
@@ -55,7 +55,6 @@ const getAttempts = () : string[] => JSON.parse(localStorage.getItem('attempts')
 const ANSWER = WORDS[getWordIndex()]
 console.log(ANSWER)
 
-// TODO: Check for `win` or `lose` on page start
 // TODO: `help` and `stats` modal
 // TODO: Some kind of notification system
 // TODO: Modal animations?
@@ -86,6 +85,33 @@ class LetterBlock {
         this.blockElement.dataset.state = state
         return this
     }
+}
+
+/* Modal */
+
+function getFinishModalHTML(isWin : boolean, word : string, attempts : string[]) : string {
+    return `
+        <div class='modal-header'>${isWin ? 'WIN' : 'LOSE'}</div>
+        <div class='modal-body'>${word}</div>
+        <div class='modal-footer'>${attempts.join(', ')}</div>
+    `
+}
+
+function openModal(bodyHtml : string) {
+    const closeModal = () => document.body.querySelector('#modal-wrapper')?.remove()
+
+    const wrapper = document.createElement('div')
+    wrapper.classList.add('modal-wrapper')
+    wrapper.id = 'modal-wrapper'
+    
+    const modal = document.createElement('div')
+    modal.classList.add('modal')
+    modal.innerHTML = bodyHtml
+    modal.addEventListener('click', e => e.stopPropagation()) 
+    
+    wrapper.appendChild(modal)
+    wrapper.addEventListener('click', closeModal)
+    document.body.appendChild(wrapper)
 }
 
 class GameGrid {
@@ -125,6 +151,15 @@ class GameGrid {
 
     setStatus(status : IGameStatus) {
         this.gameStatus = setGameStatusLS(status)
+    }
+
+    winGame() {
+        this.setStatus('won')
+        openModal(getFinishModalHTML(true,  ANSWER, this.attempts))
+    }
+    loseGame() { 
+        this.setStatus('lost')
+        openModal(getFinishModalHTML(false, ANSWER, this.attempts))
     }
 
     setCurrentWord(word : string) {
@@ -177,11 +212,6 @@ class GameGrid {
             { this.handleError('Words can be noly length of 5'); return }
         if (!includes(WORDS, this.currentWord)) 
             { this.handleError(`Invalid word ${this.currentWord}`); return }
-            
-        if (this.currentWord === ANSWER) {
-            console.log('WON')
-            this.setStatus('won')
-        }
 
         let prevRowIdx = this.attempts.length;
         let prevWord = this.currentWord
@@ -191,9 +221,11 @@ class GameGrid {
 
         this.attempts.push(this.currentWord)
         setAttempts([...getAttempts(), this.currentWord])
+        if (this.currentWord === ANSWER) {
+            this.winGame()
+        }
         if (this.attempts.length >= this.wordMatrix.length && this.gameStatus === 'notfinished') {
-            console.log('LOST')
-            this.setStatus('lost')
+            this.loseGame()
         }
         if (this.gameStatus === 'notfinished') this.setCurrentWord('')
         
