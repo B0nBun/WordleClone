@@ -301,16 +301,12 @@ body {
     opacity: .5;
 }
 
-#help-button {
+#help-button, #retry-button {
     position: absolute;
     font-weight: bolder;
     font-size: 1rem;
-    top: 1rem;
-    left: 1rem;
     color: var(--foreground2);
     border: 3px solid var(--foreground2);
-    height: 2rem;
-    width: 2rem;
     border-radius: 50%;
     display: flex;
     align-items: center;
@@ -318,7 +314,23 @@ body {
     cursor: pointer;
 }
 
-#help-button:hover {
+#help-button {
+    top: 1rem;
+    left: 1rem;
+    height: 2rem;
+    width: 2rem;
+}
+
+#retry-button {
+    top: 1rem;
+    right: 1rem;
+    height: 2rem;
+    width: 7ch;
+    border-radius: 1rem;
+}
+
+#help-button:hover,
+#retry-button:hover {
     color: var(--foreground3);
     border: 3px solid var(--foreground3);
 }

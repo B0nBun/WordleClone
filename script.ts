@@ -55,8 +55,6 @@ const ANSWER = WORDS[getWordIndex()]
 console.log(getWordIndex())
 console.log(ANSWER)
 
-// TODO: Better styling for modal
-
 // The representation of DIV in grid
 class LetterBlock {
     blockElement : HTMLElement
@@ -114,7 +112,7 @@ function getFinishModalHTML(isWin : boolean, word : string, attempts : string[])
     return `
         <div class='modal-header'>${isWin ? 'WIN' : 'LOSE'}</div>
         <div class='modal-body'>${word}</div>
-        <div class='modal-footer'>${attempts.join(', ')}</div>
+        <div class='modal-footer'>Attempts: ${attempts.join(', ')}</div>
     `
 }
 
@@ -156,6 +154,18 @@ function getHelpModalHTML() : string {
 const helpButton = document.querySelector('#help-button')!
 
 helpButton.addEventListener('click', () => openModal(getHelpModalHTML()))
+
+/* Retry button */
+
+const retryButton = document.querySelector('#retry-button')!
+
+retryButton.addEventListener('click', () => {
+    updateWordIndex()
+    updateLastUpdated()
+    setAttempts([])
+    setGameStatusLS('notfinished')
+    location.reload()
+})
 
 /* Notifications */
 
@@ -236,7 +246,7 @@ class GameGrid {
     
     addLetter(letter : string) {
         if (this.gameStatus !== 'notfinished')
-            return
+            {this.handleError("The game is already finished"); return}
         if (!letter.match(/[a-zA-Z]/))
             return
         if (this.currentWord.length >= 5)
