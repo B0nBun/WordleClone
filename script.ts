@@ -40,7 +40,7 @@ const getGameStatusLS = () : IGameStatus => {
 const checkLastUpdated = () => {
     let current = Math.floor((new Date()).getTime() / 1000)
     // Checking if last update was 24h ago
-    if ((current - getLastUpdated()) / 60 / 60 / 24 >= 0.2 || localStorage.getItem('wordIdx') === null) {
+    if ((current - getLastUpdated()) / 60 / 60 / 24 >= 1 || localStorage.getItem('wordIdx') === null) {
         updateWordIndex()
         updateLastUpdated()
         setAttempts([])
@@ -57,9 +57,7 @@ console.log(ANSWER)
 
 // TODO: `help` and `stats` modal
 // TODO: Some kind of notification system
-// TODO: Modal animations?
 // TODO: Better styling for modal
-// TODO: Maybe wait for word opening before opening modal
 // TODOBUG: After finishing game and reloading the page word chages, while still having the same attempts
 
 // The representation of DIV in grid
@@ -92,14 +90,6 @@ class LetterBlock {
 
 /* Modal */
 
-function getFinishModalHTML(isWin : boolean, word : string, attempts : string[]) : string {
-    return `
-        <div class='modal-header'>${isWin ? 'WIN' : 'LOSE'}</div>
-        <div class='modal-body'>${word}</div>
-        <div class='modal-footer'>${attempts.join(', ')}</div>
-    `
-}
-
 function openModal(bodyHtml : string) {
     const closeModal = () => {
         const wrapper = document.body.querySelector('#modal-wrapper')
@@ -122,6 +112,26 @@ function openModal(bodyHtml : string) {
     wrapper.addEventListener('click', closeModal)
     document.body.appendChild(wrapper)
 }
+
+function getFinishModalHTML(isWin : boolean, word : string, attempts : string[]) : string {
+    return `
+        <div class='modal-header'>${isWin ? 'WIN' : 'LOSE'}</div>
+        <div class='modal-body'>${word}</div>
+        <div class='modal-footer'>${attempts.join(', ')}</div>
+    `
+}
+
+function getHelpModalHTML() : string {
+    return `
+        <div class='modal-header'>HELP</div>
+        <div class='modal-body'>https://www.powerlanguage.co.uk/wordle/</div>
+        <div class='modal-footer'>This is a help modal</div>
+    `
+}
+
+const helpButton = document.querySelector('#help-button')!
+
+helpButton.addEventListener('click', () => openModal(getHelpModalHTML()))
 
 class GameGrid {
     gridElement : HTMLElement

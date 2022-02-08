@@ -300,3 +300,25 @@ body {
     font-size: .5em;
     opacity: .5;
 }
+
+#help-button {
+    position: absolute;
+    font-weight: bolder;
+    font-size: 1rem;
+    top: 1rem;
+    left: 1rem;
+    color: var(--foreground2);
+    border: 3px solid var(--foreground2);
+    height: 2rem;
+    width: 2rem;
+    border-radius: 50%;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    cursor: pointer;
+}
+
+#help-button:hover {
+    color: var(--foreground3);
+    border: 3px solid var(--foreground3);
+}
