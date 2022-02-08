@@ -274,7 +274,7 @@ body {
 }
 
 .modal {
-    background-color: var(--foreground1);
+    background-color: var(--foreground0);
     font-size: 2rem;
     color: var(--foreground3);
     padding: 1em;

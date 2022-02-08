@@ -55,7 +55,6 @@ const ANSWER = WORDS[getWordIndex()]
 console.log(getWordIndex())
 console.log(ANSWER)
 
-// TODO: finish `help` modal
 // TODO: Better styling for modal
 
 // The representation of DIV in grid
@@ -122,8 +121,35 @@ function getFinishModalHTML(isWin : boolean, word : string, attempts : string[])
 function getHelpModalHTML() : string {
     return `
         <div class='modal-header'>HELP</div>
-        <div class='modal-body'>https://www.powerlanguage.co.uk/wordle/</div>
-        <div class='modal-footer'>This is a help modal</div>
+        <div>
+            <div style="font-size: 1.2rem">
+            The
+            <span style="color: var(--present)">yellow</span>
+            letters are present in the word
+            </div>
+            <div style="height: 1rem; opacity: 0">spacer</div>
+            <div class="word-row">
+                <div class="letter-block" data-state="opened">A</div>
+                <div class="letter-block" data-state="opened">P</div>
+                <div class="letter-block" data-state="opened">P</div>
+                <div class="letter-block" data-state="present">L</div>
+                <div class="letter-block" data-state="opened">E</div>
+            </div>
+            <div style="height: 2rem; opacity: 0">spacer</div>
+            <div style="font-size: 1.2rem">
+            The
+            <span style="color: var(--correct)">green</span>
+            letters are correct
+            </div>
+            <div style="height: 1rem; opacity: 0">spacer</div>
+            <div class="word-row">
+                <div class="letter-block" data-state="opened">A</div>
+                <div class="letter-block" data-state="opened">P</div>
+                <div class="letter-block" data-state="opened">P</div>
+                <div class="letter-block" data-state="correct">L</div>
+                <div class="letter-block" data-state="opened">E</div>
+            </div>
+        </div>
     `
 }
 
