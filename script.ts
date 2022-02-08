@@ -55,10 +55,9 @@ const ANSWER = WORDS[getWordIndex()]
 console.log(getWordIndex())
 console.log(ANSWER)
 
-// TODO: `help` and `stats` modal
-// TODO: Some kind of notification system
+// TODO: finish `help` modal
+// TODO: Some kind of notification system for errors
 // TODO: Better styling for modal
-// TODOBUG: After finishing game and reloading the page word chages, while still having the same attempts
 
 // The representation of DIV in grid
 class LetterBlock {
@@ -133,6 +132,24 @@ const helpButton = document.querySelector('#help-button')!
 
 helpButton.addEventListener('click', () => openModal(getHelpModalHTML()))
 
+/* Notifications */
+
+const createNotificationElem = (text : string) => {
+    const div = document.createElement("div")
+    div.classList.add("notification")
+    div.textContent = text
+    return div
+}
+
+const notifications = document.querySelector("#notifications")!
+const addNotification = (text : string) => {
+    const div = createNotificationElem(text)
+    notifications.prepend(div)
+    setTimeout(() => {
+        div.remove()
+    }, 1000)
+}
+
 class GameGrid {
     gridElement : HTMLElement
     attempts    : string[]
@@ -189,15 +206,16 @@ class GameGrid {
     
     handleError(message : string) {
         console.error(message)
+        addNotification(message)
     }
     
     addLetter(letter : string) {
         if (this.gameStatus !== 'notfinished')
-            { this.handleError('The game is already finished'); return }
+            return
         if (!letter.match(/[a-zA-Z]/))
-            { this.handleError('Only latin letters are allowed'); return }
+            return
         if (this.currentWord.length >= 5)
-            { this.handleError('Words can be only length of 5'); return }
+            return
 
         if (letter.length !== 1) throw new Error(`addLetter accepts only one letter, '${letter}' was passed`)
         this.setCurrentWord(this.currentWord + letter.toLowerCase())
@@ -228,9 +246,9 @@ class GameGrid {
         if (this.gameStatus !== 'notfinished')
             { this.handleError('The game is already finished'); return }
         if (this.currentWord.length < 5) 
-            { this.handleError('Words can be noly length of 5'); return }
+            return
         if (!includes(WORDS, this.currentWord)) 
-            { this.handleError(`Invalid word ${this.currentWord}`); return }
+            { this.handleError(`Invalid word "${this.currentWord}"`); return }
 
         let prevRowIdx = this.attempts.length;
         let prevWord = this.currentWord

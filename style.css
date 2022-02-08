@@ -322,3 +322,33 @@ body {
     color: var(--foreground3);
     border: 3px solid var(--foreground3);
 }
+
+#notifications {
+    position: fixed;
+    top: 5rem;
+    left: 50%;
+    transform: translate(-50%, 0);
+    display: flex;
+    flex-direction: column;
+    z-index: 10;
+    gap: 1rem;
+}
+
+@keyframes notification-fade-out {
+    0% {
+        opacity: 1;
+    }
+    100% {
+        opacity: 0;
+    }
+}
+
+.notification {
+    font-size: 1.2rem;
+    background-color: var(--foreground3);
+    color: var(--background);
+    padding: .8em;
+    border-radius: .2rem;
+    opacity: .9;
+    animation: notification-fade-out .2s .7s ease-out 1 forwards;
+}
