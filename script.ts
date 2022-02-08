@@ -56,7 +56,6 @@ console.log(getWordIndex())
 console.log(ANSWER)
 
 // TODO: finish `help` modal
-// TODO: Some kind of notification system for errors
 // TODO: Better styling for modal
 
 // The representation of DIV in grid
